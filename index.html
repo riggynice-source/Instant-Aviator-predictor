@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AVIATOR PREDICTOR</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{--red:#ff2244;--orange:#ff6600;--yellow:#ffcc00;--green:#00ff88;--cyan:#00eeff;--dark:#080c10;--panel:#0d1520;--border:rgba(255,34,68,.32);--gr:0 0 14px #ff2244,0 0 35px rgba(255,34,68,.4);--gg:0 0 14px #00ff88,0 0 35px rgba(0,255,136,.3);--gc:0 0 10px #00eeff,0 0 28px rgba(0,238,255,.3)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--dark);color:#c8d8e8;font-family:'Share Tech Mono',monospace;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,34,68,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,34,68,.04) 1px,transparent 1px);background-size:40px 40px;animation:gs 20s linear infinite;pointer-events:none;z-index:0}
+@keyframes gs{to{background-position:40px 40px}}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.1) 2px,rgba(0,0,0,.1) 4px);pointer-events:none;z-index:998}
+.screen{position:fixed;inset:0;z-index:10;overflow-y:auto}.hidden{display:none!important}
+#authScreen{display:flex;align-items:center;justify-content:center;padding:20px;background:var(--dark)}
+.aw{width:100%;max-width:420px;position:relative;z-index:1;animation:rise .5s ease}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.al{text-align:center;margin-bottom:28px}
+.abadge{display:inline-block;background:rgba(255,34,68,.12);border:1px solid var(--red);color:var(--red);font-size:9px;letter-spacing:4px;padding:4px 14px;margin-bottom:12px;text-transform:uppercase;box-shadow:var(--gr)}
+.al h1{font-family:'Orbitron',sans-serif;font-size:clamp(22px,6vw,38px);font-weight:900;letter-spacing:4px;color:#fff;text-shadow:0 0 20px rgba(255,34,68,.7),0 0 60px rgba(255,34,68,.3)}
+.al h1 span{color:var(--red)}
+.al .atag{font-size:10px;letter-spacing:3px;color:#445;text-transform:uppercase;margin-top:5px}
+.ac{background:var(--panel);border:1px solid var(--border);padding:28px 26px;position:relative;overflow:hidden}
+.ac::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);box-shadow:0 0 12px var(--red)}
+.tabs{display:flex;margin-bottom:24px;border-bottom:1px solid var(--border)}
+.tab{flex:1;padding:9px;background:none;border:none;cursor:pointer;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#445;transition:color .2s;position:relative}
+.tab.on{color:var(--red)}.tab.on::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--red);box-shadow:0 0 8px var(--red)}
+.field{margin-bottom:16px}.field label{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#556;margin-bottom:6px}
+.phr{display:flex}.pfx{display:flex;align-items:center;gap:6px;background:rgba(255,34,68,.08);border:1px solid var(--border);border-right:none;padding:0 12px;font-size:13px;color:#aaa;white-space:nowrap;flex-shrink:0}
+.ai{width:100%;padding:11px 14px;background:rgba(255,255,255,.03);border:1px solid var(--border);color:#e0eaf4;font-family:'Share Tech Mono',monospace;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+.ai:focus{border-color:var(--red);box-shadow:0 0 0 2px rgba(255,34,68,.1)}.ai.ph{border-left:none;flex:1}.ai::placeholder{color:#334}
+.pw{position:relative}.pw .ai{padding-right:44px}.pe{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#445;font-size:14px}.pe:hover{color:var(--red)}
+.fhint{font-size:10px;color:#445;margin-top:4px;letter-spacing:1px}.ferr{font-size:10px;color:var(--red);margin-top:4px;letter-spacing:1px;display:none}
+.sb{display:flex;gap:4px;margin-top:5px}.ss{flex:1;height:3px;background:rgba(255,255,255,.05);border-radius:1px;transition:background .3s}
+.ss.s1{background:var(--red)}.ss.s2{background:var(--orange)}.ss.s3{background:var(--yellow)}.ss.s4{background:var(--green)}
+.abtn{display:block;width:100%;padding:14px;background:transparent;border:2px solid var(--red);color:var(--red);font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;transition:color .2s,box-shadow .2s;margin-top:4px}
+.abtn::before{content:'';position:absolute;inset:0;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .25s ease;z-index:0}
+.abtn:hover::before{transform:scaleX(1)}.abtn:hover{color:#fff;box-shadow:var(--gr)}.abtn span{position:relative;z-index:1}.abtn:disabled{opacity:.5;cursor:not-allowed}
+.afoot{text-align:center;margin-top:18px;font-size:10px;color:#445;letter-spacing:1px}.afoot a{color:var(--cyan);text-decoration:none;cursor:pointer}.afoot a:hover{color:var(--red)}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--panel);border:1px solid var(--green);color:var(--green);font-size:11px;letter-spacing:2px;padding:11px 22px;z-index:9999;opacity:0;transition:all .3s;white-space:nowrap;box-shadow:var(--gg);pointer-events:none}
+.toast.terr{border-color:var(--red);color:var(--red);box-shadow:var(--gr)}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.topbar{display:flex;align-items:center;justify-content:space-between;background:var(--panel);border-bottom:1px solid var(--border);padding:10px 20px;position:sticky;top:0;z-index:50}
+.tbl{display:flex;align-items:center;gap:14px}.tbr{display:flex;align-items:center;gap:8px}
+.tlogo{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;color:#fff;letter-spacing:3px}.tlogo span{color:var(--red)}
+.tuser{font-size:10px;letter-spacing:2px;color:var(--cyan)}
+.tbtn{background:none;border:1px solid var(--border);color:#556;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:5px 12px;cursor:pointer;text-transform:uppercase;transition:all .2s}
+.tbtn:hover{border-color:var(--red);color:var(--red)}.tbtn.tc{border-color:rgba(0,238,255,.3);color:var(--cyan)}.tbtn.tc:hover{border-color:var(--cyan);box-shadow:var(--gc)}
+#hubScreen{background:transparent;padding-bottom:60px}
+.wrap{max-width:980px;margin:0 auto;padding:24px 20px;position:relative;z-index:1}
+.hh{text-align:center;margin-bottom:28px}.hh h2{font-family:'Orbitron',sans-serif;font-size:clamp(18px,4vw,32px);font-weight:900;color:#fff;letter-spacing:3px;text-shadow:0 0 20px rgba(255,34,68,.5)}.hh h2 span{color:var(--red)}.hh p{font-size:11px;letter-spacing:2px;color:#556;margin-top:8px;text-transform:uppercase}
+.hsts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:26px}
+@media(max-width:580px){.hsts{grid-template-columns:repeat(2,1fr)}}
+.hst{background:var(--panel);border:1px solid var(--border);padding:12px;text-align:center}.hstv{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:700;color:var(--cyan);text-shadow:var(--gc)}.hstl{font-size:9px;letter-spacing:2px;color:#445;text-transform:uppercase;margin-top:3px}
+.stl{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;color:var(--red);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px}.stl::after{content:'';flex:1;height:1px;background:var(--border)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:28px}
+.scard{background:var(--panel);border:1px solid var(--border);padding:16px 15px;cursor:pointer;position:relative;overflow:hidden;transition:border-color .25s,transform .2s,box-shadow .25s}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--sc,var(--red));box-shadow:0 0 10px var(--sc,var(--red))}.scard:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,.4)}.scard.ul{border-color:rgba(0,255,136,.3)}
+.sctop{display:flex;align-items:center;gap:10px;margin-bottom:11px}.scic{font-size:24px}.scnm{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:#fff;letter-spacing:1px}.scsb{font-size:9px;letter-spacing:2px;color:#445;text-transform:uppercase;margin-top:2px}
+.scbot{display:flex;align-items:center;justify-content:space-between}.scst{font-size:9px;letter-spacing:2px;text-transform:uppercase}.scst.lk{color:#445}.scst.ul{color:var(--green)}.scpr{font-size:10px;letter-spacing:1px}.scpr.paid{color:var(--green)}.scpr.unpaid{color:var(--yellow)}
+.hottag{position:absolute;top:9px;right:9px;background:rgba(255,204,0,.15);border:1px solid rgba(255,204,0,.4);color:var(--yellow);font-size:8px;letter-spacing:2px;padding:2px 6px;text-transform:uppercase}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:var(--panel);border:1px solid var(--border);width:100%;max-width:440px;position:relative;overflow:hidden;animation:rise .3s ease}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--yellow),transparent);box-shadow:0 0 12px var(--yellow)}
+.mhd{padding:18px 22px 13px;border-bottom:1px solid var(--border)}.mtl{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:var(--yellow)}.msb{font-size:10px;letter-spacing:3px;color:#556;text-transform:uppercase;margin-top:4px}
+.mbd{padding:18px 22px}
+.mpb{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.2);padding:14px;margin-bottom:16px}.mpb p{font-size:11px;line-height:1.9;letter-spacing:1px;color:#8ab}
+.mpn{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;color:var(--green);text-shadow:var(--gg);letter-spacing:3px;margin:8px 0 3px}.mpw{font-size:10px;color:#556;letter-spacing:2px}.mpa{font-size:12px;color:var(--yellow);letter-spacing:2px;margin-top:6px}
+.mft{padding:12px 22px 18px;display:flex;gap:10px}
+.mb2{flex:1;padding:11px;border:2px solid;font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;background:transparent;transition:all .2s;position:relative;overflow:hidden}.mb2 span{position:relative;z-index:1}.mb2::before{content:'';position:absolute;inset:0;transform:scaleX(0);transform-origin:left;transition:transform .25s;z-index:0}
+.mb2.cl{border-color:var(--border);color:#445}.mb2.cl:hover{border-color:var(--red);color:var(--red)}.mb2.cf{border-color:var(--green);color:var(--green)}.mb2.cf::before{background:var(--green)}.mb2.cf:hover{color:#000;box-shadow:var(--gg)}.mb2.cf:hover::before{transform:scaleX(1)}.mb2:disabled{opacity:.5;cursor:not-allowed}
+#predScreen{background:transparent;padding-bottom:60px}
+.pw2{max-width:860px;margin:0 auto;padding:20px;position:relative;z-index:1}
+.shdr{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:13px 17px;background:var(--panel);border:1px solid var(--border);position:relative;overflow:hidden}
+.shdr::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--sc,var(--red));box-shadow:0 0 10px var(--sc,var(--red))}
+.shic{font-size:28px}.shnm{font-family:'Orbitron',sans-serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:2px}.shsb{font-size:9px;letter-spacing:2px;color:#556;text-transform:uppercase;margin-top:2px}.shbg{margin-left:auto;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);color:var(--green);font-size:9px;letter-spacing:2px;padding:4px 10px;text-transform:uppercase;white-space:nowrap}
+.ptk{position:relative;height:80px;margin:0 0 18px;overflow:hidden;background:rgba(255,34,68,.02);border:1px solid var(--border)}
+.trl{position:absolute;top:50%;left:0;width:0%;height:2px;background:linear-gradient(90deg,transparent,var(--red),var(--orange));transform:translateY(-50%);box-shadow:0 0 8px var(--red)}
+.pln{position:absolute;top:50%;left:0%;transform:translateY(-50%);font-size:26px;filter:drop-shadow(0 0 8px var(--orange))}
+.lvm{position:absolute;top:6px;right:12px;font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;color:var(--yellow);text-shadow:0 0 14px var(--yellow);letter-spacing:2px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:18px 20px;margin-bottom:14px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);box-shadow:0 0 8px var(--red)}
+.ptl{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:3px;color:var(--red);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}.ptl::after{content:'';flex:1;height:1px;background:var(--border)}
+.lb{height:110px;overflow-y:auto;font-size:11px;line-height:1.9;color:#7a9;scrollbar-width:thin;scrollbar-color:var(--red) transparent}.lb::-webkit-scrollbar{width:3px}.lb::-webkit-scrollbar-thumb{background:var(--red)}
+.ll{opacity:0;animation:fl .3s forwards}.ll.red{color:var(--red)}.ll.green{color:var(--green)}.ll.yellow{color:var(--yellow)}.ll.cyan{color:var(--cyan)}
+@keyframes fl{from{opacity:0;transform:translateX(-5px)}to{opacity:1;transform:none}}
+.rbtn{display:block;width:100%;padding:15px;background:transparent;border:2px solid var(--red);color:var(--red);font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;letter-spacing:4px;text-transform:uppercase;cursor:pointer;position:relative;overflow:hidden;transition:color .2s,box-shadow .2s;margin-bottom:14px}
+.rbtn::before{content:'';position:absolute;inset:0;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .25s ease;z-index:0}.rbtn:hover::before{transform:scaleX(1)}.rbtn:hover{color:#fff;box-shadow:var(--gr)}.rbtn span{position:relative;z-index:1}.rbtn:disabled{opacity:.5;cursor:not-allowed}
+.rc{display:none;text-align:center;padding:26px;border:1px solid var(--green);background:rgba(0,255,136,.04);position:relative;overflow:hidden;margin-bottom:14px;animation:pop .4s ease}
+@keyframes pop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+.rc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);box-shadow:0 0 10px var(--green)}
+.rlb{font-size:9px;letter-spacing:4px;color:var(--green);text-transform:uppercase;margin-bottom:7px}
+.rm{font-family:'Orbitron',sans-serif;font-size:clamp(46px,12vw,86px);font-weight:900;color:#fff;text-shadow:0 0 30px var(--green),0 0 70px rgba(0,255,136,.5);line-height:1;letter-spacing:2px}
+.rm .x{color:var(--green);font-size:.5em;vertical-align:super}
+.rs{margin-top:9px;font-size:10px;letter-spacing:3px;text-transform:uppercase}.rs.safe{color:var(--green)}.rs.caution{color:var(--yellow)}.rs.danger{color:var(--red)}
+.sr{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.sbox{background:var(--panel);border:1px solid var(--border);padding:12px;text-align:center}.sv{font-family:'Orbitron',sans-serif;font-size:19px;font-weight:700;color:var(--cyan);text-shadow:var(--gc)}.sl{font-size:9px;letter-spacing:2px;color:#445;text-transform:uppercase;margin-top:3px}
+.pbs{display:flex;flex-direction:column;gap:8px}.pbi{display:flex;flex-direction:column;gap:3px}
+.pbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#556;display:flex;justify-content:space-between}.pbl span{color:#8a9}
+.pbt{height:5px;background:rgba(255,255,255,.05);border-radius:1px;overflow:hidden}.pbf{height:100%;border-radius:1px;transition:width .8s ease}
+.pbf.r{background:linear-gradient(90deg,var(--red),var(--orange));box-shadow:0 0 6px var(--red)}.pbf.y{background:linear-gradient(90deg,var(--orange),var(--yellow));box-shadow:0 0 6px var(--yellow)}.pbf.g{background:linear-gradient(90deg,var(--cyan),var(--green));box-shadow:0 0 6px var(--green)}
+.hg{display:flex;flex-wrap:wrap;gap:6px}.hc{font-family:'Orbitron',sans-serif;font-size:10px;font-weight:700;padding:4px 9px;border-radius:2px;letter-spacing:1px;animation:ci .3s ease}
+@keyframes ci{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.hc.low{background:rgba(255,34,68,.15);color:var(--red);border:1px solid rgba(255,34,68,.4)}.hc.mid{background:rgba(255,204,0,.12);color:var(--yellow);border:1px solid rgba(255,204,0,.35)}.hc.high{background:rgba(0,255,136,.1);color:var(--green);border:1px solid rgba(0,255,136,.3)}
+.ws{background:repeating-linear-gradient(45deg,rgba(255,34,68,.06),rgba(255,34,68,.06) 10px,transparent 10px,transparent 20px);border:1px solid rgba(255,34,68,.18);padding:7px 14px;font-size:9px;letter-spacing:2px;color:rgba(255,34,68,.55);text-align:center;text-transform:uppercase;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="screen" style="display:flex">
+  <div class="aw">
+    <div class="al">
+      <div class="abadge">⚠ SECURE ACCESS REQUIRED ⚠</div>
+      <h1>AVI<span>ATOR</span><br>PREDICTOR</h1>
+      <div class="atag">Kenya's #1 Neural Prediction Engine</div>
+    </div>
+    <div class="ac">
+      <div class="tabs">
+        <button class="tab on" id="tL" onclick="switchTab('login')">LOGIN</button>
+        <button class="tab" id="tS" onclick="switchTab('signup')">SIGN UP</button>
+      </div>
+      <div id="fL">
+        <div class="field"><label>Kenyan Phone Number</label>
+          <div class="phr"><div class="pfx">&#x1F1F0;&#x1F1EA; +254</div><input class="ai ph" id="lPh" type="tel" placeholder="7XX XXX XXX" maxlength="9" oninput="this.value=this.value.replace(/\D/g,'')"/></div>
+          <div class="ferr" id="lPhE">Invalid Kenyan number</div></div>
+        <div class="field"><label>Password</label>
+          <div class="pw"><input class="ai" id="lPw" type="password" placeholder="Enter your password"/><button class="pe" onclick="eye('lPw',this)" tabindex="-1">&#x1F441;</button></div>
+          <div class="ferr" id="lPwE">Incorrect password</div></div>
+        <button class="abtn" onclick="doLogin()"><span>&#x26A1; ACCESS SYSTEM &#x26A1;</span></button>
+      </div>
+      <div id="fS" style="display:none">
+        <div class="field"><label>Kenyan Phone Number</label>
+          <div class="phr"><div class="pfx">&#x1F1F0;&#x1F1EA; +254</div><input class="ai ph" id="sPh" type="tel" placeholder="7XX XXX XXX" maxlength="9" oninput="this.value=this.value.replace(/\D/g,'')"/></div>
+          <div class="fhint">Safaricom, Airtel or Telkom</div>
+          <div class="ferr" id="sPhE">Enter a valid 9-digit number</div></div>
+        <div class="field"><label>Create Password</label>
+          <div class="pw"><input class="ai" id="sPw" type="password" placeholder="Min 6 characters" oninput="pwStr(this.value)"/><button class="pe" onclick="eye('sPw',this)" tabindex="-1">&#x1F441;</button></div>
+          <div class="sb"><div class="ss" id="sg1"></div><div class="ss" id="sg2"></div><div class="ss" id="sg3"></div><div class="ss" id="sg4"></div></div>
+          <div class="ferr" id="sPwE">Password must be at least 6 characters</div></div>
+        <div class="field"><label>Confirm Password</label>
+          <div class="pw"><input class="ai" id="sPw2" type="password" placeholder="Repeat password"/><button class="pe" onclick="eye('sPw2',this)" tabindex="-1">&#x1F441;</button></div>
+          <div class="ferr" id="sPw2E">Passwords do not match</div></div>
+        <button class="abtn" onclick="doSignup()"><span>&#x1F6E1; CREATE ACCOUNT</span></button>
+      </div>
+      <div class="afoot" id="aFt">Don't have an account? <a onclick="switchTab('signup')">Sign up here</a></div>
+    </div>
+  </div>
+</div>
+
+<div id="hubScreen" class="screen hidden">
+  <div class="topbar">
+    <div class="tbl"><div class="tlogo">AVI<span>ATOR</span></div><div class="tuser" id="hubUser"></div></div>
+    <div class="tbr"><button class="tbtn" onclick="doLogout()">LOGOUT</button></div>
+  </div>
+  <div class="wrap">
+    <div class="hh"><h2>SELECT <span>BETTING SITE</span></h2><p>Pay KES 1,000 per site &middot; Unlock Aviator predictions</p></div>
+    <div class="hsts">
+      <div class="hst"><div class="hstv" id="hTot">0</div><div class="hstl">Predictions</div></div>
+      <div class="hst"><div class="hstv" id="hAvg">&#8212;</div><div class="hstl">Avg Multiplier</div></div>
+      <div class="hst"><div class="hstv" id="hBest">&#8212;</div><div class="hstl">Best Call</div></div>
+      <div class="hst"><div class="hstv" id="hUnlk">0</div><div class="hstl">Sites Unlocked</div></div>
+    </div>
+    <div class="stl">&#x1F525; Popular Sites</div>
+    <div class="sgrid" id="popGrid"></div>
+    <div class="stl">More Sites</div>
+    <div class="sgrid" id="moreGrid"></div>
+  </div>
+</div>
+
+<div class="ov hidden" id="payModal">
+  <div class="modal">
+    <div class="mhd"><div class="mtl">&#x1F513; UNLOCK PREDICTIONS</div><div class="msb" id="mSiteNm"></div></div>
+    <div class="mbd">
+      <div class="mpb">
+        <p>Send <strong style="color:var(--yellow)">KES 1,000</strong> via M-Pesa Paybill:</p>
+        <div class="mpn">522 533</div>
+        <div class="mpw">AVIATOR PREDICTOR LTD</div>
+        <div class="mpa">Account No: Your phone &nbsp;&middot;&nbsp; Amount: KES 1,000</div>
+      </div>
+      <div class="field"><label>M-Pesa Confirmation Code</label>
+        <input class="ai" id="mCode" type="text" placeholder="e.g. QJK9XY1234" maxlength="10" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"/>
+        <div class="fhint">10-character code from your M-Pesa SMS</div>
+        <div class="ferr" id="mErr">Invalid M-Pesa code</div></div>
+    </div>
+    <div class="mft">
+      <button class="mb2 cl" onclick="closeModal()"><span>CANCEL</span></button>
+      <button class="mb2 cf" id="cBtn" onclick="confirmPay()"><span>&#x2714; CONFIRM PAYMENT</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="predScreen" class="screen hidden">
+  <div class="topbar">
+    <div class="tbl"><div class="tlogo">AVI<span>ATOR</span></div></div>
+    <div class="tbr"><button class="tbtn tc" onclick="goHub()">&#x25C4; ALL SITES</button><button class="tbtn" onclick="doLogout()">LOGOUT</button></div>
+  </div>
+  <div class="pw2">
+    <div class="shdr" id="sHdr">
+      <div class="shic" id="shIc">&#x2708;</div>
+      <div><div class="shnm" id="shNm">&#8212;</div><div class="shsb">Aviator Crash Predictor</div></div>
+      <div class="shbg">&#x1F513; UNLOCKED</div>
+    </div>
+    <div class="ws">&#x26A0; For entertainment only &mdash; Results are randomly generated &#x26A0;</div>
+    <div class="ptk"><div class="trl" id="trail"></div><div class="pln" id="plane">&#x2708;</div><div class="lvm" id="livem">1.00x</div></div>
+    <div class="sr">
+      <div class="sbox"><div class="sv" id="stTot">0</div><div class="sl">Predictions</div></div>
+      <div class="sbox"><div class="sv" id="stAvg">&#8212;</div><div class="sl">Avg Mult</div></div>
+      <div class="sbox"><div class="sv" id="stBest">&#8212;</div><div class="sl">Best Call</div></div>
+    </div>
+    <div class="panel"><div class="ptl">System Log</div><div class="lb" id="logBox"></div></div>
+    <button class="rbtn" id="runBtn" onclick="runPred()"><span>&#x26A1; RUN PREDICTION ALGORITHM &#x26A1;</span></button>
+    <div class="rc" id="rCard">
+      <div class="rlb">Predicted Crash Point</div>
+      <div class="rm" id="rNum"><span class="x">x</span>&#8212;</div>
+      <div class="rs" id="rSig"></div>
+    </div>
+    <div class="panel">
+      <div class="ptl">Signal Analysis</div>
+      <div class="pbs">
+        <div class="pbi"><div class="pbl">Volatility Index <span id="p1">0%</span></div><div class="pbt"><div class="pbf r" id="b1" style="width:0%"></div></div></div>
+        <div class="pbi"><div class="pbl">Pattern Confidence <span id="p2">0%</span></div><div class="pbt"><div class="pbf y" id="b2" style="width:0%"></div></div></div>
+        <div class="pbi"><div class="pbl">Safe Zone Probability <span id="p3">0%</span></div><div class="pbt"><div class="pbf g" id="b3" style="width:0%"></div></div></div>
+      </div>
+    </div>
+    <div class="panel"><div class="ptl">Recent History</div><div class="hg" id="histGrid"><span style="color:#334;font-size:10px;letter-spacing:2px">NO DATA YET</span></div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+// ── Firebase Setup ──────────────────────────────────────────
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBFvTdD9TyOaYSU84RxjKdnux8fNxQdE0I",
+  authDomain: "aviator-predictor-7fe31.firebaseapp.com",
+  projectId: "aviator-predictor-7fe31",
+  storageBucket: "aviator-predictor-7fe31.firebasestorage.app",
+  messagingSenderId: "18395128067",
+  appId: "1:18395128067:web:a53752913c5b5c8abf8936"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// In-memory cache for current user data
+const DB = { access: new Set(), preds: {}, usedCodes: new Set() };
+
+async function loadUserData(uid) {
+  try {
+    const snap = await getDoc(doc(db, "users", uid));
+    if (snap.exists()) {
+      const d = snap.data();
+      DB.access = new Set(d.access || []);
+      DB.preds = d.preds || {};
+      DB.usedCodes = new Set(d.usedCodes || []);
+    } else {
+      DB.access = new Set(); DB.preds = {}; DB.usedCodes = new Set();
+      await setDoc(doc(db, "users", uid), { access:[], preds:{}, usedCodes:[], createdAt:Date.now() });
+    }
+  } catch(e) { console.warn("loadUserData error", e); }
+}
+
+async function saveAccess() { if(CU) await updateDoc(doc(db,"users",CU),{access:[...DB.access]}); }
+async function saveUsedCodes() { if(CU) await updateDoc(doc(db,"users",CU),{usedCodes:[...DB.usedCodes]}); }
+async function savePreds() { if(CU) await updateDoc(doc(db,"users",CU),{preds:DB.preds}); }
+
+function toEmail(phone){ return "254"+phone+"@aviator.app"; }
+const SITES=[
+  {id:"sportybet",name:"SportyBet",color:"#ff6600",icon:"&#x1F3C6;",popular:true},
+  {id:"betway",name:"Betway",color:"#00a650",icon:"&#x26BD;",popular:true},
+  {id:"1xbet",name:"1xBet",color:"#1a6fb5",icon:"&#x1F3AF;",popular:true},
+  {id:"mozzartbet",name:"MozzartBet",color:"#e30613",icon:"&#x1F3B0;",popular:true},
+  {id:"betika",name:"Betika",color:"#7b2d8b",icon:"&#x1F981;",popular:true},
+  {id:"odibets",name:"OdiBets",color:"#f7a700",icon:"&#x1F525;",popular:false},
+  {id:"betin",name:"Betin",color:"#004b87",icon:"&#x1F3B2;",popular:false},
+  {id:"elitebet",name:"EliteBet",color:"#c8a400",icon:"&#x1F48E;",popular:false},
+  {id:"palmsbet",name:"PalmsBet",color:"#228B22",icon:"&#x1F334;",popular:false},
+  {id:"premierebet",name:"PremiereBet",color:"#8b0000",icon:"&#x1F451;",popular:false},
+  {id:"dafabet",name:"Dafabet",color:"#f5a623",icon:"&#x1F0CF;",popular:false},
+  {id:"bangbet",name:"BangBet",color:"#ff1493",icon:"&#x1F4A5;",popular:false},
+];
+let CU=null,CS=null,preds=[],running=false,raf=null;
+function toast(m,t){const e=document.getElementById("toast");e.textContent=m;e.className="toast"+(t==="err"?" terr":"")+" show";setTimeout(()=>{e.className="toast"},2800)}
+function sE(id,m){const e=document.getElementById(id);if(m)e.textContent=m;e.style.display="block"}
+function hE(id){document.getElementById(id).style.display="none"}
+function show(id){document.getElementById(id).classList.remove("hidden")}
+function hide(id){document.getElementById(id).classList.add("hidden")}
+function eye(id,b){const i=document.getElementById(id);i.type=i.type==="password"?"text":"password";b.innerHTML=i.type==="password"?"&#x1F441;":"&#x1F648;"}
+function pwStr(v){const s=["sg1","sg2","sg3","sg4"].map(x=>document.getElementById(x));s.forEach(x=>x.className="ss");if(!v)return;let sc=0;if(v.length>=6)sc++;if(v.length>=10)sc++;if(/[A-Z]/.test(v)||/\d/.test(v))sc++;if(/[^a-zA-Z0-9]/.test(v))sc++;for(let i=0;i<sc;i++)s[i].classList.add("s"+(i+1))}
+function vKE(n){return /^[71]\d{8}$/.test(n)}
+
+
+function switchTab(t){document.getElementById("fL").style.display=t==="login"?"block":"none";document.getElementById("fS").style.display=t==="signup"?"block":"none";document.getElementById("tL").className="tab"+(t==="login"?" on":"");document.getElementById("tS").className="tab"+(t==="signup"?" on":"");document.getElementById("aFt").innerHTML=t==="login"?"Don't have an account? <a onclick=\"switchTab('signup')\">Sign up here</a>":"Already have an account? <a onclick=\"switchTab('login')\">Login here</a>";["lPhE","lPwE","sPhE","sPwE","sPw2E"].forEach(hE)}
+async function doSignup(){const ph=document.getElementById("sPh").value.trim();const pw=document.getElementById("sPw").value;const pw2=document.getElementById("sPw2").value;["sPhE","sPwE","sPw2E"].forEach(hE);let ok=true;if(!vKE(ph)){sE("sPhE");ok=false}if(pw.length<6){sE("sPwE");ok=false}if(pw!==pw2){sE("sPw2E");ok=false}if(!ok)return;const btn=document.querySelector("#fS .abtn");btn.disabled=true;btn.querySelector("span").textContent="CREATING...";try{const cred=await createUserWithEmailAndPassword(auth,toEmail(ph),pw);await loadUserData(cred.user.uid);toast("Account created!");enterApp(cred.user.uid,ph);}catch(e){let msg="Signup failed";if(e.code==="auth/email-already-in-use")msg="Number already registered";sE("sPhE",msg);}finally{btn.disabled=false;btn.querySelector("span").textContent="CREATE ACCOUNT";}}
+async function doLogin(){const ph=document.getElementById("lPh").value.trim();const pw=document.getElementById("lPw").value;["lPhE","lPwE"].forEach(hE);let ok=true;if(!vKE(ph)){sE("lPhE");ok=false}if(!pw){sE("lPwE","Enter your password");ok=false}if(!ok)return;const btn=document.querySelector("#fL .abtn");btn.disabled=true;btn.querySelector("span").textContent="LOGGING IN...";try{const cred=await signInWithEmailAndPassword(auth,toEmail(ph),pw);await loadUserData(cred.user.uid);toast("Access granted!");enterApp(cred.user.uid,ph);}catch(e){let msg="Login failed";if(e.code==="auth/user-not-found"||e.code==="auth/invalid-credential"||e.code==="auth/invalid-email")msg="Number not registered — sign up first";else if(e.code==="auth/wrong-password")msg="Incorrect password";sE("lPwE",msg);}finally{btn.disabled=false;btn.querySelector("span").textContent="ACCESS SYSTEM";}}
+function enterApp(uid,phone){CU=uid;document.getElementById("authScreen").style.display="none";show("hubScreen");document.getElementById("hubUser").textContent="+"+(phone||uid);renderHub()}
+async function doLogout(){await signOut(auth);CU=null;CS=null;hide("hubScreen");hide("predScreen");document.getElementById("authScreen").style.display="flex";["lPh","lPw","sPh","sPw","sPw2"].forEach(id=>{document.getElementById(id).value=""});pwStr("");switchTab("login");toast("Logged out.","err")}
+function getStats(){const all=Object.entries(DB.preds).filter(([k])=>k.startsWith(CU+":")).flatMap(([,a])=>a.map(p=>p.m));return{total:all.length,avg:all.length?(all.reduce((a,b)=>a+b,0)/all.length).toFixed(2):null,best:all.length?Math.max(...all).toFixed(2):null,sites:DB.access?DB.access.size:0}}
+function renderHub(){const st=getStats();document.getElementById("hTot").textContent=st.total;document.getElementById("hAvg").textContent=st.avg?st.avg+"x":"\u2014";document.getElementById("hBest").textContent=st.best?st.best+"x":"\u2014";document.getElementById("hUnlk").textContent=st.sites;const pg=document.getElementById("popGrid");const mg=document.getElementById("moreGrid");pg.innerHTML="";mg.innerHTML="";SITES.forEach(s=>{const ul=DB.access.has(s.id);const d=document.createElement("div");d.className="scard"+(ul?" ul":"");d.style.setProperty("--sc",s.color);d.innerHTML=(s.popular?'<div class="hottag">HOT</div>':'')+'<div class="sctop"><div class="scic">'+s.icon+'</div><div><div class="scnm">'+s.name+'</div><div class="scsb">Aviator Predictor</div></div></div><div class="scbot"><div class="scst '+(ul?'ul':'lk')+'">'+(ul?'\uD83D\uDD13 UNLOCKED':'\uD83D\uDD12 LOCKED')+'</div><div class="scpr '+(ul?'paid':'unpaid')+'">'+(ul?'\u2714 PAID':'KES 1,000')+'</div></div>';d.onclick=()=>ul?openPred(s):openModal(s);(s.popular?pg:mg).appendChild(d)})}
+let PS=null;
+function openModal(s){PS=s;document.getElementById("mSiteNm").textContent=s.icon+" "+s.name.toUpperCase();document.getElementById("mCode").value="";hE("mErr");show("payModal")}
+function closeModal(){hide("payModal");PS=null}
+function confirmPay(){if(!PS)return;const raw=document.getElementById("mCode").value.trim().toUpperCase();hE("mErr");if(!/^[A-Z][A-Z0-9]{9}$/.test(raw)){sE("mErr","Must be exactly 10 characters e.g. QJK9XY1234");return}if(DB.usedCodes.has(raw)){sE("mErr","This M-Pesa code has already been used");return}if(DB.access.has(PS.id)){sE("mErr","You already have access to this site");return}const btn=document.getElementById("cBtn");btn.disabled=true;btn.querySelector("span").textContent="VERIFYING...";setTimeout(()=>{DB.usedCodes.add(raw);DB.access.add(PS.id);saveAccess();saveUsedCodes();btn.disabled=false;btn.querySelector("span").innerHTML="\u2714 CONFIRM PAYMENT";toast(PS.name+" predictions activated!");closeModal();renderHub()},1200)}
+function openPred(s){CS=s;hide("hubScreen");show("predScreen");document.getElementById("shIc").innerHTML=s.icon;document.getElementById("shNm").textContent=s.name;document.getElementById("sHdr").style.setProperty("--sc",s.color);boot()}
+function goHub(){hide("predScreen");show("hubScreen");renderHub()}
+function boot(){const key=CU+":"+CS.id;preds=(DB.preds[key]||[]).map(p=>p.m);document.getElementById("logBox").innerHTML="";document.getElementById("rCard").style.display="none";["b1","b2","b3"].forEach(id=>document.getElementById(id).style.width="0%");["p1","p2","p3"].forEach(id=>document.getElementById(id).textContent="0%");resetPlane();addLog("[BOOT] Initializing neural network...","cyan",0);addLog("[BOOT] Loading "+CS.name+" pattern data...","",300);addLog("[BOOT] Calibrating crash models...","",600);const hist=DB.preds[key]||[];const grid=document.getElementById("histGrid");grid.innerHTML=hist.length?"":'<span style="color:#334;font-size:10px;letter-spacing:2px">NO DATA YET</span>';hist.slice().reverse().forEach(p=>addChip(grid,p.m));updStats();addLog("[SYS]  Algorithm ready. Awaiting input.","green",900)}
+function addLog(t,c,d){d=d||0;setTimeout(()=>{const lb=document.getElementById("logBox");const el=document.createElement("div");el.className="ll"+(c?" "+c:"");el.textContent=t;lb.appendChild(el);lb.scrollTop=lb.scrollHeight},d)}
+function genM(){const r=Math.random();if(r<.30)return+(1.0+Math.random()*.5).toFixed(2);if(r<.55)return+(1.5+Math.random()*1.0).toFixed(2);if(r<.75)return+(2.5+Math.random()*2.5).toFixed(2);if(r<.88)return+(5.0+Math.random()*5.0).toFixed(2);if(r<.96)return+(10+Math.random()*15).toFixed(2);return+(25+Math.random()*75).toFixed(2)}
+function animP(target,dur,done){const pl=document.getElementById("plane"),tr=document.getElementById("trail"),lm=document.getElementById("livem"),t0=performance.now();cancelAnimationFrame(raf);function f(now){const t=Math.min((now-t0)/dur,1);pl.style.left=(t*82)+"%";tr.style.width=(t*82)+"%";lm.textContent=(1+(target-1)*t).toFixed(2)+"x";if(t<1){raf=requestAnimationFrame(f)}else{lm.textContent=target.toFixed(2)+"x";if(done)done()}}raf=requestAnimationFrame(f)}
+function resetPlane(){document.getElementById("plane").style.left="0%";document.getElementById("trail").style.width="0%";document.getElementById("livem").textContent="1.00x"}
+function addChip(grid,m){const c=document.createElement("div");c.className="hc "+(m<2?"low":m<5?"mid":"high");c.textContent=m.toFixed(2)+"x";grid.insertBefore(c,grid.firstChild);while(grid.children.length>20)grid.removeChild(grid.lastChild)}
+function updStats(){const a=(DB.preds[CU+":"+CS.id]||[]).map(p=>p.m);document.getElementById("stTot").textContent=a.length||"0";document.getElementById("stAvg").textContent=a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2)+"x":"\u2014";document.getElementById("stBest").textContent=a.length?Math.max(...a).toFixed(2)+"x":"\u2014"}
+function runPred(){if(running)return;running=true;document.getElementById("runBtn").disabled=true;document.getElementById("rCard").style.display="none";resetPlane();const steps=[{t:"[SCAN] Fetching server seed hash...",c:""},{t:"[ALGO] Analyzing last 500 "+CS.name+" rounds...",c:""},{t:"[ML]   Running LSTM crash model...",c:"cyan"},{t:"[ML]   Applying Markov chain filter...",c:"cyan"},{t:"[CALC] Computing probability matrix...",c:""},{t:"[PRED] Crash point isolated.",c:"yellow"}];const m=genM(),dur=Math.min(4000,1200+m*120),sig=m<1.5?"danger":m<3?"caution":"safe";steps.forEach((s,i)=>addLog(s.t,s.c,i*380));setTimeout(()=>{animP(m,dur,()=>{document.getElementById("rNum").innerHTML='<span class="x">x</span>'+m.toFixed(2);document.getElementById("rCard").style.display="block";const st=sig==="danger"?"\u26A0 DANGER \u2014 Crash Early":sig==="caution"?"\u25C8 CAUTION \u2014 Moderate Risk":"\u2714 SIGNAL STRONG \u2014 Safe Zone";const el=document.getElementById("rSig");el.textContent=st;el.className="rs "+sig;if(sig==="danger")addLog("[WARN] High risk! Cash out early.","red");else if(sig==="caution")addLog("[INFO] Moderate. Proceed carefully.","yellow");else addLog("[OK]  Strong signal. x"+m.toFixed(2),"green");const key=CU+":"+CS.id;if(!DB.preds[key])DB.preds[key]=[];DB.preds[key].push({m,sig,ts:Date.now()});savePreds();updStats();const grid=document.getElementById("histGrid");const ph=grid.querySelector("span");if(ph)ph.remove();addChip(grid,m);const v=Math.min(100,Math.round(30+Math.random()*60)),cf=Math.min(100,Math.round(40+Math.random()*55)),sf=m>=2?Math.min(100,Math.round(50+Math.random()*40)):Math.round(5+Math.random()*30);setTimeout(()=>{document.getElementById("b1").style.width=v+"%";document.getElementById("p1").textContent=v+"%";document.getElementById("b2").style.width=cf+"%";document.getElementById("p2").textContent=cf+"%";document.getElementById("b3").style.width=sf+"%";document.getElementById("p3").textContent=sf+"%"},100);document.getElementById("runBtn").disabled=false;running=false})},steps.length*380-200)}
+
+// Expose functions to global scope (required for onclick handlers with type="module")
+window.doSignup = doSignup;
+window.doLogin = doLogin;
+window.doLogout = doLogout;
+window.switchTab = switchTab;
+window.eye = eye;
+window.pwStr = pwStr;
+window.closeModal = closeModal;
+window.confirmPay = confirmPay;
+window.goHub = goHub;
+window.runPred = runPred;
+window.openModal = openModal;
+
+// Auto-login via Firebase Auth state
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    await loadUserData(user.uid);
+    // Extract phone from email format 254XXXXXXXXX@aviator.app
+    const phone = user.email ? user.email.replace("@aviator.app","").substring(3) : "";
+    enterApp(user.uid, phone);
+  }
+});
+</script>
+</body>
+</html>
